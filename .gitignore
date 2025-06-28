@@ -1,3 +1,7 @@
 .vs/
 ChatGateServer/
 x64/
+ChatGateServer.vcxproj.user
+ChatGateServer.vcxproj.filters
+ChatGateServer.vcxproj
+ChatGateServer.sln
