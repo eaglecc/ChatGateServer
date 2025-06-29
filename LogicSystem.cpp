@@ -5,7 +5,12 @@ LogicSystem::LogicSystem()
 {
     RegGet("/get_test", [](std::shared_ptr<HttpConnection> connection) {
         beast::ostream(connection->_response.body()) << "receive get_test req";
-        });
+        int i = 0;
+        for (auto& param : connection->_get_params) {
+            beast::ostream(connection->_response.body()) << "\n" << param.first << " = " << param.second;
+            i++;
+        }
+    });
 }
 
 bool LogicSystem::HandleGet(std::string path, std::shared_ptr<HttpConnection> con) {
