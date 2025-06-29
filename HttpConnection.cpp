@@ -157,7 +157,7 @@ void HttpConnection::HandleReq()
     if (_request.method() == http::verb::get)
     {
         PreParseGetParam(); // 解析URL，结果存在_get_url和_get_params中
-        bool success = LogicSystem::GetInstance()->HandleGet(_request.target(), shared_from_this());
+        bool success = LogicSystem::GetInstance()->HandleGet(_get_url, shared_from_this());
         if (!success)
         {
             _response.result(http::status::not_found);
@@ -170,4 +170,27 @@ void HttpConnection::HandleReq()
         _response.set(http::field::server, "ChatGateServer");
         WriteResponse();
     }
+    else if (_request.method() == http::verb::post)
+    {
+        bool success = LogicSystem::GetInstance()->HandlePost(_request.target(), shared_from_this());
+        if (!success)
+        {
+            _response.result(http::status::not_found);
+            _response.set(http::field::content_type, "text/plain");
+            beast::ostream(_response.body()) << "Resource not found \r\n";
+            WriteResponse();
+            return;
+        }
+        _response.result(http::status::ok);
+        _response.set(http::field::server, "ChatGateServer");
+        WriteResponse();
+    }
+    else
+    {
+        _response.result(http::status::bad_request);
+        _response.set(http::field::content_type, "text/plain");
+        beast::ostream(_response.body()) << "Unsupported HTTP method \r\n";
+        WriteResponse();
+    }
+
 }
