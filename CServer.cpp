@@ -15,13 +15,22 @@ void CServer::Start()
         [self](beast::error_code ec) {
             try {
                 if (ec) {
-                    self->Start(); return;
+                    std::cout << "Accept error: " << ec.message() << std::endl;
+                    self->Start(); 
+                    return;
                 }
-                // ´´½¨ĞÂÁ¬½Ó£¬²¢ÇÒ´´½¨HttpConnectionÀà¹ÜÀíÕâ¸öÁ¬½Ó
+                // æœ‰æ–°çš„è¿æ¥ï¼Œåˆ›å»ºHttpConnectionå¯¹è±¡æ¥å¤„ç†
                 std::make_shared<HttpConnection>(std::move(self->_socket))->Start();
+                
+                // é‡æ–°åˆ›å»ºsocketå¹¶ç»§ç»­æ¥å—æ–°è¿æ¥
+                self->_socket = tcp::socket(self->_ioc);
+                self->Start();
             }
-            catch (const std::exception&) {
-
+            catch (const std::exception& e) {
+                std::cout << "Exception in CServer::Start: " << e.what() << std::endl;
+                // å³ä½¿å‡ºç°å¼‚å¸¸ä¹Ÿè¦ç»§ç»­æ¥å—æ–°è¿æ¥
+                self->_socket = tcp::socket(self->_ioc);
+                self->Start();
             }
         });
 }
